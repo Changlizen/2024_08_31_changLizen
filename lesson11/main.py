@@ -1,4 +1,5 @@
 #! usr/bin/micropython
+
 '''
 led->gpio15
 光敏電阻 -> gpio28
@@ -7,12 +8,8 @@ led->gpio15
 '''
 
 from machine import Timer,ADC,Pin,PWM,RTC
+import tools
 
-adc = ADC(4)
-adc_light = ADC(Pin(28))
-pwm = PWM(Pin(15),freq=50)
-conversion_factor = 3.3 / (65535)
-rtc = RTC()
 
 def do_thing(t):
     '''
@@ -29,9 +26,6 @@ def do_thing(t):
 
 
 def do_thing1(t):
-    adc1 = ADC(Pin(26))
-    duty = adc1.read_u16()
-    pwm.duty_u16(duty)
     '''
     :param t:Timer的實體
     負責可變電阻和改變led的亮度
@@ -40,18 +34,24 @@ def do_thing1(t):
     duty = adc1.read_u16()
     pwm.duty_u16(duty)    
     print(f'可變電阻:{round(duty/65535*10)}')
-    
+
 
 def main():
     t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
     t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
+    try:
+        tools.connect()
+    except RuntimeError as e:
+        print(e)
+    except Exception:
+        print('不知明的錯誤')
+    else:
+        t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
+        t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
 
-t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
-t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
 if __name__ == '__main__':
     adc = ADC(4) #內建溫度
     adc1 = ADC(Pin(26)) #可變電阻
     adc_light = ADC(Pin(28)) #光敏電阻
     pwm = PWM(Pin(15),freq=50) #pwm led
-    
     main()
