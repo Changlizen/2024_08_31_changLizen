@@ -41,17 +41,7 @@ def do_thing1(t):
 
 
 def main():
-    t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
-    t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
-    try:
-        tools.connect()
-    except RuntimeError as e:
-        print(e)
-    except Exception:
-        print('不知明的錯誤')
-    else:
-        t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
-        t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
+    pass
 
 
 if __name__ == '__main__':
@@ -59,10 +49,19 @@ if __name__ == '__main__':
     adc1 = ADC(Pin(26)) #可變電阻
     adc_light = ADC(Pin(28)) #光敏電阻
     pwm = PWM(Pin(15),freq=50) #pwm led
+    try:
+        tools.connect()
+    except RuntimeError as e:
+        print(e)
+    except Exception:
+        print('不知明的錯誤')
+    else:
+        #MQTT
+        SERVER = "192.168.0.252"
+        CLIENT_ID = binascii.hexlify(machine.unique_id())
+        mqtt = MQTTClient(CLIENT_ID, SERVER,user='pi',password='raspberry')
+        mqtt.connect()
+        t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
+        t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
 
-    #MQTT
-    SERVER = "192.168.0.252"
-    CLIENT_ID = binascii.hexlify(machine.unique_id())
-    mqtt = MQTTClient(CLIENT_ID, SERVER,user='pi',password='raspberry')
-    mqtt.connect()
     main()
