@@ -12,7 +12,7 @@ def main():
         mqtt.connect()  
         
         while True:   
-            mqtt.publish(TOPIC, b"25.66")
+            mqtt.publish(TOPIC, b"24.666")
             time.sleep_ms(2000)
     except Exception:
         mqtt.disconnect()
@@ -21,5 +21,5 @@ if __name__ == '__main__':
     # Default MQTT server to connect to
     SERVER = "192.168.0.252"
     CLIENT_ID = binascii.hexlify(machine.unique_id())
-    TOPIC = b"SA-39/屋舍/溫度"
+    TOPIC = b"SA-39/House/溫度"
     main()
