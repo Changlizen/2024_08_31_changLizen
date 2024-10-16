@@ -29,7 +29,7 @@ if ser.isOpen():
         time.sleep(0.5)  # 等待0.5秒
         # 讀取8個byte數據
         response = ser.read(8)
-        print("read 8 byte data:")
+        print("read 8 byte data: 78, 78, 78, 78, 78, 78, 78, 78")
         print(response)
         ser.close()
     except Exception as e1:
