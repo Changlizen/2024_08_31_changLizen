@@ -2,12 +2,11 @@ import paho.mqtt.client as mqtt # type: ignore
 from datetime import datetime
 import os,csv
 
-def record(date:str,topic:str,value:int):
+def record(topic:str,value:int | float):
     '''
     #檢查是否有data資料夾,沒有就建立data資料夾
     #取得今天日期,如果沒有今天日期.csv,就建立一個全新的今天日期.csv
     #將參數r的資料,儲存進入csv檔案內
-    #parameters date:str -> 這是日期
     #parameters topic:str -> 這是訂閱的topic
     #parameters value:int -> 這是訂閱的value
     '''
@@ -15,10 +14,10 @@ def record(date:str,topic:str,value:int):
     data_dir = os.path.join(root_dir, 'data')
     if not os.path.isdir(data_dir):    
             os.mkdir('data')
-    
-    today = datetime.today()
 
+    today = datetime.today()
     current_str = today.strftime("%Y-%m-%d %H:%M:%S")
+    date = today.strftime("%Y-%m-%d")
     filename = date + ".csv"
     #get_file_abspath
     full_path = os.path.join(data_dir,filename)
@@ -27,11 +26,12 @@ def record(date:str,topic:str,value:int):
         print('沒有這個檔')
         with open(full_path,mode='w',encoding='utf-8',newline='') as file:
             file.write('時間,設備,值\n')
-    
+
     with open(full_path, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow([current_str,topic,value])
-    
+
+
 def on_connect(client, userdata, flags, reason_code, properties):
     #連線bloker成功時,只會執行一次
     client.subscribe("SA-39/#")
@@ -46,17 +46,13 @@ def on_message(client, userdata, msg):
         led_value = int(value)
         if led_value != led_origin_value:
             led_origin_value = led_value
-            print(f'led_value:{led_value}')
-            today = datetime.now()
-            now_str = today.strftime("%Y-%m-%d")
-            #save_data = [now_str,"SA-39/LED_LEVEL",led_value]
-            record(now_str,topic,led_value)
-    #print(f"Received message '{msg.payload.decode()}' on topic '{msg.topic}'")
+            record(topic,led_value)
     
     if topic == 'SA-39/TEMPERATURE':
-        if temperature_origin_value != value:
-           temperature_origin_value = value
-           print(f'溫度:{value}')
+        temperature_value = float(value)
+        if temperature_origin_value != temperature_value:           
+           temperature_origin_value = temperature_value
+           record(topic,temperature_value)
 
 def main():
     client = mqtt.Client(callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
@@ -69,7 +65,8 @@ def main():
     client.connect("192.168.0.252", 1883, 60)
     client.loop_forever()
 
+
 if __name__ == "__main__":
-    led_origin_value = 0 
+    led_origin_value = 0
     temperature_origin_value = 0.0
     main()
