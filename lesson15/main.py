@@ -7,9 +7,10 @@ led->gpio15
 內建溫度sensor -> adc最後1pin,共5pin
 '''
 
-from machine import Timer,ADC,Pin,PWM,RTC
+from platform import machine
+from machine import Timer,ADC,Pin,PWM,RTC # type: ignore
 import binascii
-from umqtt.simple import MQTTClient
+from umqtt.simple import MQTTClient # type: ignore
 import tools
 
 
@@ -23,28 +24,29 @@ def do_thing(t):
     reading = adc.read_u16() * conversion_factor
     temperature = 27 - (reading - 0.706)/0.001721  
     print(f'溫度:{temperature}')
+    print(f'溫度:{round(temperature,2)}')
     mqtt.publish('SA-39/TEMPERATURE', f'{temperature}')
     adc_value = adc_light.read_u16()
     print(f'光線:{adc_value}')
     mqtt.publish('SA-39/LINE_LEVEL', f'{adc_value}')
-    
-    
+
+
 def do_thing1(t):
     '''
     :param t:Timer的實體
     負責可變電阻和改變led的亮度
     '''    
-    
+
     duty = adc1.read_u16()
     pwm.duty_u16(duty)
     light_level = round(duty/65535*10)
     print(f'可變電阻:{light_level}')
     mqtt.publish('SA-39/LED_LEVEL', f'{light_level}')
-    
+
 
 def main():
     pass
-        
+
 
 if __name__ == '__main__':
     adc = ADC(4) #內建溫度
@@ -65,6 +67,4 @@ if __name__ == '__main__':
         mqtt = MQTTClient(CLIENT_ID, SERVER,user='pi',password='raspberry')
         mqtt.connect()
         t1 = Timer(period=2000, mode=Timer.PERIODIC, callback=do_thing)
-        t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)   
-    
-    main()
+        t2 = Timer(period=500, mode=Timer.PERIODIC, callback=do_thing1)
