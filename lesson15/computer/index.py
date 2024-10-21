@@ -76,5 +76,5 @@ def main():
 if __name__ == "__main__":
     led_origin_value = 0
     temperature_origin_value = 0.0
-    line_origin_status = None 
+    line_origin_status = None
     main()
