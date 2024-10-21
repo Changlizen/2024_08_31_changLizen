@@ -22,10 +22,6 @@ def record(r):
         writer = csv.writer(file)
         writer.writerow(r)
 
-    
-
-
-
 def on_connect(client, userdata, flags, reason_code, properties):
     #連線bloker成功時,只會執行一次
     client.subscribe("SA-39/#")
