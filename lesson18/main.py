@@ -42,6 +42,7 @@ def do_thing1(t):
     light_level = round(duty/65535*10)
     print(f'可變電阻:{light_level}')
     mqtt.publish('SA-39/LED_LEVEL', f'{light_level}')
+    blynk_mqtt.publish('ds/led_level',f'{light_level}')
 
 
 def main():
