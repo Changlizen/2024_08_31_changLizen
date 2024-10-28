@@ -2,7 +2,7 @@ import serial
 import time
 
 ser = serial.Serial()
-ser.port = "COM5"  # 根據你的COM port進行調整
+ser.port = "COM9"  # 根據你的COM port進行調整
 ser.baudrate = 9600
 ser.bytesize = serial.EIGHTBITS
 ser.parity = serial.PARITY_NONE
